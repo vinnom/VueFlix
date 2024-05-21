@@ -1,5 +1,52 @@
 <script setup>
-console.log("VueFlix");
+import { onMounted, ref } from "vue";
+
+const isAddingMovie = ref(false);
+const switchAddMovieForm = () => {
+    isAddingMovie.value = !isAddingMovie.value;
+    return isAddingMovie.value;
+};
+
+const finishForm = () => {
+    clearMovieField();
+    switchAddMovieForm();
+};
+
+const movieField = ref({
+    name: "",
+    url: "",
+    releaseDate: "",
+    genre: "",
+});
+
+const movies = ref([]);
+
+const addMovie = () => {
+    movies.value.push({
+        name: movieField.value.name,
+        url: movieField.value.url,
+        releaseDate: movieField.value.releaseDate,
+        genre: movieField.value.genre,
+    });
+
+    finishForm();
+};
+
+const clearMovieField = () => {
+    movieField.value.name = "";
+    movieField.value.url = "";
+    movieField.value.releaseDate = "";
+    movieField.value.genre = "";
+};
+
+onMounted(() => {
+    movies.value.push({
+        name: "Vue.js: The Documentary",
+        url: "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/eqNdWOXUuTWefYMycWz7dVE0Irv.jpg",
+        releaseDate: "24/02/2020",
+        genre: "Documentário",
+    });
+});
 </script>
 <template>
     <div class="vueflix">
@@ -14,35 +61,32 @@ console.log("VueFlix");
             </div>
 
             <div class="novo-filme">
-                <div class="adicionar-filme">
-                    <input type="text" autocomplete="off" placeholder="Nome do Filme" />
-                    <input type="text" autocomplete="off" placeholder="URL da Imagem" />
-                    <input type="text" autocomplete="off" placeholder="Ano de Lançamento" />
-                    <input type="text" autocomplete="off" placeholder="Gênero" />
+                <div v-if="isAddingMovie" class="adicionar-filme">
+                    <input v-model="movieField.name" type="text" autocomplete="off" placeholder="Nome do Filme" />
+                    <input v-model="movieField.url" type="text" autocomplete="off" placeholder="URL da Imagem" />
+                    <input v-model="movieField.releaseDate" type="text" autocomplete="off" placeholder="Lançamento" />
+                    <input v-model="movieField.genre" type="text" autocomplete="off" placeholder="Gênero" />
                     <div class="acoes">
-                        <button class="botao ativo">Salvar</button>
-                        <button class="botao danger ativo">Cancelar</button>
+                        <button @click="addMovie" class="botao ativo">Salvar</button>
+                        <button @click="finishForm" class="botao danger ativo">Cancelar</button>
                     </div>
                 </div>
-                <button class="botao ativo">Adicionar Filme</button>
+                <button v-else @click="switchAddMovieForm" class="botao ativo">Adicionar Filme</button>
             </div>
         </div>
 
         <div class="filmes">
-            <div class="filme">
+            <div v-for="movie in movies" class="filme">
                 <div class="capa-container">
                     <div class="acoes-filme">
                         <button class="botao">Gostei</button>
                         <button class="botao danger">Não Gostei</button>
                         <button class="botao danger">Excluir</button>
                     </div>
-                    <img
-                        class="capa"
-                        src="https://www.themoviedb.org/t/p/w600_and_h900_bestv2/eqNdWOXUuTWefYMycWz7dVE0Irv.jpg"
-                        alt="" />
+                    <img class="capa" :src="movie.url" alt="" />
                 </div>
-                <div class="nome">Vue.js: The Documentary</div>
-                <div class="info">24/02/2020 - Documentário</div>
+                <div class="nome">{{ movie.name }}</div>
+                <div class="info">{{ movie.releaseDate }} - {{ movie.genre }}</div>
             </div>
         </div>
     </div>
