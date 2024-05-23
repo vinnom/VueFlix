@@ -1,6 +1,12 @@
 <script setup>
 import { onMounted, ref } from "vue";
 
+const RATE = {
+    none: 0,
+    like: 1,
+    dislike: 2,
+};
+
 const isAddingMovie = ref(false);
 const switchAddMovieForm = () => {
     isAddingMovie.value = !isAddingMovie.value;
@@ -17,6 +23,7 @@ const movieField = ref({
     url: "",
     releaseDate: "",
     genre: "",
+    rate: RATE.none,
 });
 
 const movies = ref([]);
@@ -27,6 +34,7 @@ const addMovie = () => {
         url: movieField.value.url,
         releaseDate: movieField.value.releaseDate,
         genre: movieField.value.genre,
+        rate: RATE.none,
     });
 
     finishForm();
@@ -37,6 +45,16 @@ const removeMovie = (movieIndex) => {
     if (confirm(warning)) {
         movies.value.splice(movieIndex, 1);
     }
+};
+
+const rateMovie = (movieIndex, rate) => {
+    movies.value[movieIndex].rate = rate;
+};
+
+const markRated = (movieIndex, rate) => {
+    return {
+        ativo: movies.value[movieIndex].rate === rate,
+    };
 };
 
 const clearMovieField = () => {
@@ -86,8 +104,15 @@ onMounted(() => {
             <div v-for="(movie, index) in movies" class="filme">
                 <div class="capa-container">
                     <div class="acoes-filme">
-                        <button class="botao">Gostei</button>
-                        <button class="botao danger">Não Gostei</button>
+                        <button @click="rateMovie(index, RATE.like)" :class="markRated(index, RATE.like)" class="botao">
+                            Gostei
+                        </button>
+                        <button
+                            @click="rateMovie(index, RATE.dislike)"
+                            :class="markRated(index, RATE.dislike)"
+                            class="botao danger">
+                            Não Gostei
+                        </button>
                         <button @click="removeMovie(index)" class="botao danger">Excluir</button>
                     </div>
                     <img class="capa" :src="movie.url" alt="" />
