@@ -1,6 +1,7 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
+const KEY_VUEFLIX = "vueflix";
 const RATE = {
     none: 0,
     like: 1,
@@ -76,14 +77,14 @@ const clearMovieField = () => {
 };
 
 onMounted(() => {
-    movies.value.push({
-        name: "Vue.js: The Documentary",
-        url: "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/eqNdWOXUuTWefYMycWz7dVE0Irv.jpg",
-        releaseDate: "24/02/2020",
-        genre: "Documentário",
-    });
+    movies.value = JSON.parse(localStorage.getItem(KEY_VUEFLIX)) || [];
+});
+
+onBeforeUnmount(() => {
+    localStorage.setItem(KEY_VUEFLIX, JSON.stringify(movies.value));
 });
 </script>
+
 <template>
     <div class="vueflix">
         <div class="acoes-usuario">
