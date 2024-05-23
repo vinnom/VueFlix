@@ -57,6 +57,17 @@ const markRated = (movieIndex, rate) => {
     };
 };
 
+const filter = ref(RATE.none);
+const filterMovieRate = (rate) => {
+    filter.value = rate;
+};
+
+const markActive = (selected) => {
+    return {
+        ativo: filter.value === selected,
+    };
+};
+
 const clearMovieField = () => {
     movieField.value.name = "";
     movieField.value.url = "";
@@ -79,9 +90,15 @@ onMounted(() => {
             <div class="filtros">
                 <div class="titulo">Filtrar</div>
                 <div class="opcoes-filtros">
-                    <button class="botao ativo">Todos</button>
-                    <button class="botao">Gostei</button>
-                    <button class="botao">Não Gostei</button>
+                    <button @click="filterMovieRate(RATE.none)" :class="markActive(RATE.none)" class="botao">
+                        Todos
+                    </button>
+                    <button @click="filterMovieRate(RATE.like)" :class="markActive(RATE.like)" class="botao">
+                        Gostei
+                    </button>
+                    <button @click="filterMovieRate(RATE.dislike)" :class="markActive(RATE.dislike)" class="botao">
+                        Não Gostei
+                    </button>
                 </div>
             </div>
 
@@ -102,23 +119,28 @@ onMounted(() => {
 
         <div class="filmes">
             <div v-for="(movie, index) in movies" class="filme">
-                <div class="capa-container">
-                    <div class="acoes-filme">
-                        <button @click="rateMovie(index, RATE.like)" :class="markRated(index, RATE.like)" class="botao">
-                            Gostei
-                        </button>
-                        <button
-                            @click="rateMovie(index, RATE.dislike)"
-                            :class="markRated(index, RATE.dislike)"
-                            class="botao danger">
-                            Não Gostei
-                        </button>
-                        <button @click="removeMovie(index)" class="botao danger">Excluir</button>
+                <div v-if="movie.rate === filter || filter === RATE.none">
+                    <div class="capa-container">
+                        <div class="acoes-filme">
+                            <button
+                                @click="rateMovie(index, RATE.like)"
+                                :class="markRated(index, RATE.like)"
+                                class="botao">
+                                Gostei
+                            </button>
+                            <button
+                                @click="rateMovie(index, RATE.dislike)"
+                                :class="markRated(index, RATE.dislike)"
+                                class="botao danger">
+                                Não Gostei
+                            </button>
+                            <button @click="removeMovie(index)" class="botao danger">Excluir</button>
+                        </div>
+                        <img class="capa" :src="movie.url" alt="" />
                     </div>
-                    <img class="capa" :src="movie.url" alt="" />
+                    <div class="nome">{{ movie.name }}</div>
+                    <div class="info">{{ movie.releaseDate }} - {{ movie.genre }}</div>
                 </div>
-                <div class="nome">{{ movie.name }}</div>
-                <div class="info">{{ movie.releaseDate }} - {{ movie.genre }}</div>
             </div>
         </div>
     </div>
