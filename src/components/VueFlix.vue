@@ -32,6 +32,13 @@ const addMovie = () => {
     finishForm();
 };
 
+const removeMovie = (movieIndex) => {
+    const warning = `Você tem certeza que gostaria de remover "${movies.value[movieIndex].name}" de sua VueFlix?`;
+    if (confirm(warning)) {
+        movies.value.splice(movieIndex, 1);
+    }
+};
+
 const clearMovieField = () => {
     movieField.value.name = "";
     movieField.value.url = "";
@@ -76,12 +83,12 @@ onMounted(() => {
         </div>
 
         <div class="filmes">
-            <div v-for="movie in movies" class="filme">
+            <div v-for="(movie, index) in movies" class="filme">
                 <div class="capa-container">
                     <div class="acoes-filme">
                         <button class="botao">Gostei</button>
                         <button class="botao danger">Não Gostei</button>
-                        <button class="botao danger">Excluir</button>
+                        <button @click="removeMovie(index)" class="botao danger">Excluir</button>
                     </div>
                     <img class="capa" :src="movie.url" alt="" />
                 </div>
